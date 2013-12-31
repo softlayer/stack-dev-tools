@@ -1,0 +1,56 @@
+{
+    "platform": ["platforms.softlayer", "CCIPlatform"],
+    "platform_options": {
+        "cores": 2,
+        "memory": 2048,
+        "datacenter": "sjc01",
+        "os_code": "DEBIAN_6_64",
+        
+        "domain": "stack.local",
+        "ssh_key_url": "http://remote.example.com/deploy/authorized_keys"
+    },
+
+    "package_manager": "apt-get install -y",
+
+    "zone_count": 2,
+
+    "proxy_services": ["memcached", "rsyslog"],
+    "storage_services": ["rsyslog", "rsync"],
+
+    "service_manager": "service {service} {action}",
+
+    "system_packages": [
+        "rsyslog",
+        "rsync",
+        "memcached",
+        "python-pip",
+        "vim-runtime",
+        "gdisk",
+        "gcc",
+        "python-dev",
+        "git",
+        "xfsprogs",
+        "ntp",
+        "sudo"
+    ],
+    "python_packages": [
+        "eventlet",
+        "netifaces",
+        "PasteDeploy",
+        "webob==1.0.8",
+        "xattr",
+        "simplejson",
+        "ipaddr",
+        "pyes",
+        "haigha",
+        "argparse"
+    ],
+    "packages": [
+        ["swift",
+         "1.7.4",
+         "git://github.com/openstack/swift.git"],
+        ["swauth",
+         "1.0.3",
+         "git://github.com/gholt/swauth.git"]
+    ]
+}

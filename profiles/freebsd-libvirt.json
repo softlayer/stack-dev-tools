@@ -1,0 +1,46 @@
+{
+    "platform": ["platforms.virt", "LibVirtPlatform"],
+    "platform_options": {
+        "vmhost_count": 11,
+        "vmhost_pattern": "vmhost%02d.stack.local",
+
+        "base_image": "sheepdog:swiftBSD:3"
+    },
+
+    "package_manager": "pkg_add -r",
+
+    "zone_count": 2,
+
+    "proxy_services": ["memcached", "rsyslogd"],
+    "storage_services": ["rsyslogd", "rsyncd"],
+
+    "service_manager": "service {service} {action}",
+
+    "system_packages": [
+        "zsh",
+        "memcached",
+        "rsyncd",
+        "rsyslog4",
+        "vim-lite"
+    ],
+    "python_packages": [
+        "netifaces",
+        "PasteDeploy",
+        "webob==1.0.8",
+        "xattr",
+        "simplejson",
+        "ipaddr",
+        "pyes",
+        "haigha",
+        "argparse",
+        "eventlet"
+    ],
+    "packages": [
+        ["swift",
+         "1.7.4",
+         "git://github.com/openstack/swift.git"],
+        ["swauth",
+         "1.0.3",
+         "git://github.com/gholt/swauth.git"]
+    ]
+}

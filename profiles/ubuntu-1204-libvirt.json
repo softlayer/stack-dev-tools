@@ -1,0 +1,52 @@
+{
+    "platform": ["platforms.virt", "LibVirtPlatform"],
+    "platform_options": {
+        "vmhost_count": 11,
+        "vmhost_pattern": "vmhost%02d.stack.local",
+
+        "base_image": "sheepdog:ubuntu1204:3"
+    },
+
+    "package_manager": "apt-get install -y",
+
+    "zone_count": 2,
+
+    "proxy_services": ["memcached", "rsyslog"],
+    "storage_services": ["rsyslog", "rsync"],
+
+    "service_manager": "service {service} {action}",
+
+    "system_packages": [
+        "rsyslog",
+        "rsync",
+        "memcached",
+        "python-pip",
+        "vim-runtime",
+        "gdisk",
+        "gcc",
+        "python-dev",
+        "git",
+        "xfsprogs",
+        "ntp"
+    ],
+    "python_packages": [
+        "eventlet",
+        "netifaces",
+        "PasteDeploy",
+        "webob==1.0.8",
+        "xattr",
+        "simplejson",
+        "ipaddr",
+        "pyes",
+        "haigha",
+        "argparse"
+    ],
+    "packages": [
+        ["swift",
+         "1.7.4",
+         "git://github.com/openstack/swift.git"],
+        ["swauth",
+         "1.0.3",
+         "git://github.com/gholt/swauth.git"]
+    ]
+}

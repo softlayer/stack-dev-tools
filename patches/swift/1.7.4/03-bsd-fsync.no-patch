@@ -1,0 +1,92 @@
+diff --git a/swift/common/utils.py b/swift/common/utils.py
+index f9765ee..ce38924 100644
+--- a/swift/common/utils.py
++++ b/swift/common/utils.py
+@@ -63,6 +63,7 @@ logging._levelNames[NOTICE] = 'NOTICE'
+ SysLogHandler.priority_map['NOTICE'] = 'notice'
+ 
+ # These are lazily pulled from libc elsewhere
++_sys_fsync = None
+ _sys_fallocate = None
+ _posix_fadvise = None
+ 
+@@ -174,6 +175,48 @@ def fallocate(fd, size):
+             raise OSError(err, 'Unable to fallocate(%s)' % size)
+ 
+ 
++class FsyncWrapper(object):
++
++    def __init__(self):
++        if hasattr(os, 'fdatasync'):
++            self.func_name = 'fdatasync'
++            self.fsync = os.fdatasync
++            self.fcntl_flag = None
++        elif hasattr(fcntl, 'F_FULLFSYNC'):
++            self.func_name = 'fcntl'
++            self.fsync = fcntl.fcntl
++            self.fcntl_flag = fcntl.F_FULLFSYNC
++        else:
++            self.func_name = 'fsync'
++            self.fsync = os.fsync
++            self.fcntl_flag = None
++
++    def __call__(self, fd):
++        args = {
++            'fdatasync': (fd, ),
++            'fsync': (fd, ),
++            'fcntl': (fd, self.fcntl_flag)
++        }
++        return self.fsync(*args[self.func_name])
++
++
++def fsync(fd):
++    """
++    Write buffered changes to disk.
++
++    :param fd: file descriptor
++    """
++
++    global _sys_fsync
++    if _sys_fsync is None:
++        _sys_fsync = FsyncWrapper()
++
++    ret = _sys_fsync(fd)
++    err = ctypes.get_errno()
++    if ret and err not in (0):
++        raise OSError(err, 'Unable to fsync(%s)' % fd)
++
++
+ def drop_buffer_cache(fd, offset, length):
+     """
+     Drop 'buffer' cache for the given range of the given file.
+diff --git a/swift/obj/server.py b/swift/obj/server.py
+index ec59dce..d573b7a 100644
+--- a/swift/obj/server.py
++++ b/swift/obj/server.py
+@@ -36,7 +36,7 @@ from xattr import getxattr, setxattr
+ from eventlet import sleep, Timeout, tpool
+ 
+ from swift.common.utils import mkdirs, normalize_timestamp, public, \
+-    storage_directory, hash_path, renamer, fallocate, \
++    storage_directory, hash_path, renamer, fallocate, fsync, \
+     split_path, drop_buffer_cache, get_logger, write_pickle, \
+     TRUE_VALUES, validate_device_partition
+ from swift.common.bufferedhttp import http_connect
+@@ -281,7 +281,7 @@ class DiskFile(object):
+         write_metadata(fd, metadata)
+         if 'Content-Length' in metadata:
+             self.drop_cache(fd, 0, int(metadata['Content-Length']))
+-        tpool.execute(os.fsync, fd)
++        tpool.execute(fsync, fd)
+         invalidate_hash(os.path.dirname(self.datadir))
+         renamer(tmppath, os.path.join(self.datadir, timestamp + extension))
+         self.metadata = metadata
+@@ -607,7 +607,7 @@ class ObjectController(object):
+                     chunk = chunk[written:]
+                 # For large files sync every 512MB (by default) written
+                 if upload_size - last_sync >= self.bytes_per_sync:
+-                    tpool.execute(os.fdatasync, fd)
++                    tpool.execute(fsync, fd)
+                     drop_buffer_cache(fd, last_sync, upload_size - last_sync)
+                     last_sync = upload_size
+                 sleep()

@@ -1,0 +1,9 @@
+/tmp/eventlet
+/tmp/hash_prefix
+*.pyc
+tmp/*.gz
+tmp/*.conf
+tmp/swift
+tmp/swauth
+work/*
+TAGS

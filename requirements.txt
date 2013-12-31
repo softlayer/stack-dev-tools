@@ -1,0 +1,4 @@
+# For lxml, ensure libxml2-dev, libxslt-dev, and python-dev are installed first.
+lxml
+fabric
+SoftLayer

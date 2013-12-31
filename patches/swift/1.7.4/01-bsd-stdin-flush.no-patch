@@ -1,0 +1,18 @@
+diff --git a/swift/common/utils.py b/swift/common/utils.py
+index f9765ee..094e28d 100644
+--- a/swift/common/utils.py
++++ b/swift/common/utils.py
+@@ -683,7 +683,12 @@ def capture_stdio(logger, **kwargs):
+     with open(os.devnull, 'r+b') as nullfile:
+         # close stdio (excludes fds open for logging)
+         for f in stdio_files:
+-            f.flush()
++            # some platforms throw an error when attempting an stdin flush
++            try:
++                f.flush()
++            except IOError:
++                pass
++
+             try:
+                 os.dup2(nullfile.fileno(), f.fileno())
+             except OSError:
