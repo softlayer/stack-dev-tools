@@ -106,7 +106,7 @@ def roledefs_from_hosts():
 if not env.PROFILE or not env.NAME:
     print "Critical environment variables missing"
     print "\tSWIFT_CLUSTER_PROFILE=(debian-6-libvirt|" \
-                                   "debian-6-softlayer-cci|"\
+                                   "debian-6-softlayer-cci|" \
                                    "ubuntu-1204-libvirt|"\
                                    "freebsd-libvirt)"
     print "\tSWIFT_CLUSTER_NAME=swdev"
@@ -673,7 +673,7 @@ def swift_test(wait_for_prep=False):
 
     if wait_for_prep:
         while not all([running_hosts.value >= len(env.hosts),
-                       prep_auth_done.value == True]): # NOQA
+                       prep_auth_done.value == True]):  # NOQA
             log_info("Waiting for all hosts to be available "
                      "before testing...")
             sleep(1)

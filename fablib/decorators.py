@@ -1,5 +1,6 @@
 from functools import wraps
 
+
 def retry(times=5):
     """A decorator which retries tasks after a SystemExit exception has been
     thrown. This combats the fail-fast nature of Fabric in hopes of recovering
@@ -21,5 +22,3 @@ def retry(times=5):
             raise
         return wrapped
     return real_retry
-
-
